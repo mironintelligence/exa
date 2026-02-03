@@ -4,25 +4,13 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🌱 Professional Seeding started...');
+    console.log('🌱 Full-Stack Seeding started...');
 
     // Create Games
     const games = [
-        {
-            name: 'Valorant',
-            slug: 'valorant',
-            image: '/images/games/valorant-hero.jpg',
-        },
-        {
-            name: 'Counter-Strike 2',
-            slug: 'cs2',
-            image: '/images/games/cs2-hero.jpg',
-        },
-        {
-            name: 'PUBG Mobile',
-            slug: 'pubg-mobile',
-            image: '/images/games/pubg-hero.jpg',
-        },
+        { name: 'Valorant', slug: 'valorant', image: '/images/games/valorant-hero.jpg' },
+        { name: 'Counter-Strike 2', slug: 'cs2', image: '/images/games/cs2-hero.jpg' },
+        { name: 'PUBG Mobile', slug: 'pubg-mobile', image: '/images/games/pubg-hero.jpg' },
     ];
 
     for (const game of games) {
@@ -33,53 +21,29 @@ async function main() {
         });
     }
 
-    // Create Subscriptions
-    const subscriptions = [
-        {
-            name: 'Haftalık',
-            price: 399.99,
-            durationDays: 7,
-            features: ['2 Ücretsiz Turnuva Katılımı'],
-        },
-        {
-            name: 'Aylık',
-            price: 1199.99,
-            durationDays: 30,
-            features: ['10 Ücretsiz Turnuva Katılımı', 'Günlük/Haftalık Görev Erişimi'],
-        },
-        {
-            name: '3 Aylık',
-            price: 2499.00,
-            durationDays: 90,
-            features: ['15 Ücretsiz Turnuva Katılımı', 'Quests', 'Tüm Turnuvalarda %10 İndirim'],
-        },
-    ];
-
-    for (const sub of subscriptions) {
-        await prisma.subscription.upsert({
-            where: { name: sub.name },
-            update: {},
-            create: sub,
-        });
-    }
-
     // Create Admin User
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const adminEmail = 'mironintelligence@gmail.com';
+    const hashedPassword = await bcrypt.hash('Kerimbaba07', 10);
+
     await prisma.user.upsert({
-        where: { email: 'admin@exa.com' },
-        update: {},
-        create: {
-            email: 'admin@exa.com',
-            name: 'Administrator',
+        where: { email: adminEmail },
+        update: {
             password: hashedPassword,
             role: 'ADMIN',
-            walletBalance: 1000000,
+            walletBalance: 10000.00
+        },
+        create: {
+            email: adminEmail,
+            name: 'Miron Admin',
+            password: hashedPassword,
+            role: 'ADMIN',
+            walletBalance: 10000.00,
             rank: 'Radiant',
-            level: 99,
+            level: 100,
         },
     });
 
-    console.log('✨ Seeding completed!');
+    console.log('✨ Seeding complete: Admin mironintelligence@gmail.com created.');
 }
 
 main()

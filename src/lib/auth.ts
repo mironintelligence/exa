@@ -15,9 +15,17 @@ export const authOptions: NextAuthOptions = {
     },
     providers: [
         GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            clientId: process.env.GOOGLE_CLIENT_ID || "placeholder",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "placeholder",
         }),
+        {
+            id: "steam",
+            name: "Steam",
+            type: "oauth",
+            authorization: "https://steamcommunity.com/openid/login",
+            // Note: Steam uses OpenID 2.0, which often requires a specific library like next-auth-steam
+            // For now, this is a UI-ready placeholder that integrates into the login buttons.
+        },
         CredentialsProvider({
             name: "credentials",
             credentials: {
@@ -49,6 +57,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id;
                 token.role = (user as any).role;
+                token.walletBalance = (user as any).walletBalance;
             }
             return token;
         },
@@ -56,6 +65,7 @@ export const authOptions: NextAuthOptions = {
             if (token) {
                 (session.user as any).id = token.id;
                 (session.user as any).role = token.role;
+                (session.user as any).walletBalance = token.walletBalance;
             }
             return session;
         },
