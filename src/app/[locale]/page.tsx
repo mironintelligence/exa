@@ -1,12 +1,22 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/navigation';
 import Image from 'next/image';
-import { Trophy, Zap, ShieldCheck, Gamepad2, TrendingUp, Users } from "lucide-react";
+import { Trophy, Zap, ShieldCheck, Gamepad2, Users } from "lucide-react";
 import { db } from "@/lib/db";
 
 export default async function LandingPage() {
-    const games = await db.game.findMany({ take: 3 });
+    // Use getTranslations for Server Components
+    const t = await getTranslations('Index');
+
+    // Safe DB fetch
+    let games = [];
+    try {
+        games = await db.game.findMany({ take: 3 });
+    } catch (error) {
+        console.error("Database fetch failed:", error);
+        // Fallback to empty or mock if needed
+    }
 
     return (
         <div className="flex flex-col">
@@ -70,9 +80,14 @@ export default async function LandingPage() {
                 </div>
 
                 <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
-                    {games.map((game, i) => (
+                    {games.length > 0 ? games.map((game, i) => (
                         <div key={game.id} className="group relative h-[600px] rounded-[40px] overflow-hidden border border-white/5">
-                            <Image src={game.image} alt={game.name} fill className="object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1" />
+                            <Image
+                                src={game.image}
+                                alt={game.name}
+                                fill
+                                className="object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1"
+                            />
                             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
                             <div className="absolute bottom-10 left-10 right-10 flex items-end justify-between">
                                 <div className="flex flex-col gap-2">
@@ -86,7 +101,11 @@ export default async function LandingPage() {
                                 </Link>
                             </div>
                         </div>
-                    ))}
+                    )) : (
+                        <div className="col-span-full py-20 text-center text-zinc-500 font-bold uppercase text-sm border-2 border-dashed border-white/5 rounded-[40px]">
+                            Henüz aktif oyun bulunmuyor.
+                        </div>
+                    )}
                 </div>
             </section>
         </div>
