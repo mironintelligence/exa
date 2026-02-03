@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GameStatus {
+  ACTIVE
+  COMING_SOON
+  MAINTENANCE
+  DISABLED
+}
+
+model Game {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String     @unique
+  image     String
+  status    GameStatus @default(COMING_SOON)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
