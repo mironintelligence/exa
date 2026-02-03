@@ -24,6 +24,7 @@ enum TransactionType {
   ENTRY_FEE
   PRIZE
   PURCHASE
+  SUBSCRIPTION
 }
 
 enum TransactionStatus {
@@ -117,13 +118,15 @@ model UserSubscription {
 }
 
 model Transaction {
-  id        String            @id @default(cuid())
-  userId    String
-  user      User              @relation(fields: [userId], references: [id])
-  amount    Float
-  type      TransactionType
-  status    TransactionStatus @default(PENDING)
-  createdAt DateTime          @default(now())
+  id          String            @id @default(cuid())
+  userId      String
+  user        User              @relation(fields: [userId], references: [id])
+  amount      Float
+  type        TransactionType
+  status      TransactionStatus @default(PENDING)
+  iban        String?           // For withdrawals
+  fullName    String?           // For withdrawals
+  createdAt   DateTime          @default(now())
 }
 
 model Product {

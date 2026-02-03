@@ -5,6 +5,7 @@ import { redirect } from "@/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wallet, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import WithdrawalForm from "./WithdrawalForm";
 
 export default async function WalletPage() {
     const session = await getServerSession(authOptions);
@@ -18,70 +19,47 @@ export default async function WalletPage() {
     if (!user) return null;
 
     return (
-        <div className="container mx-auto px-4 py-12 flex flex-col gap-12">
+        <div className="container mx-auto px-4 py-32 flex flex-col gap-12">
             <div className="flex flex-col gap-4">
-                <h1 className="text-5xl font-black italic tracking-tighter uppercase">Cüzdan Kontrol</h1>
-                <p className="text-zinc-500 text-sm font-bold uppercase tracking-[0.2em]">Finansal varlıklarınızı buradan yönetin.</p>
+                <h1 className="text-6xl font-black italic tracking-tighter uppercase text-white">Cüzdan</h1>
+                <p className="text-zinc-500 text-xs font-black uppercase tracking-[0.4em]">Varlıklarını ve Çekim Taleplerini Yönet</p>
             </div>
 
-            <div className="grid md:grid-cols-12 gap-8">
-                {/* Main Balance */}
-                <div className="md:col-span-4 flex flex-col gap-8">
-                    <Card className="bg-blue-600 border-none rounded-none text-white shadow-[0_0_50px_-20px_rgba(37,99,235,1)]">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <span className="text-xs font-black uppercase tracking-widest opacity-80">Mevcut Bakiye</span>
-                            <Wallet className="w-4 h-4 opacity-80" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-5xl font-black italic tracking-tighter">₺{user.walletBalance.toLocaleString()}</div>
-                        </CardContent>
-                    </Card>
+            <div className="grid lg:grid-cols-4 gap-8">
+                <Card className="bg-blue-600 border-none rounded-[40px] text-white p-10 shadow-2xl overflow-hidden relative lg:col-span-1">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl" />
+                    <CardHeader className="p-0 mb-8 flex flex-row items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-80">BAKİYE</span>
+                        <Wallet className="w-5 h-5 opacity-80" />
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="text-5xl font-black italic tracking-tighter">₺{user.walletBalance.toLocaleString()}</div>
+                    </CardContent>
+                </Card>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <Button size="lg" className="h-20 bg-zinc-900 border border-white/5 hover:bg-zinc-800 rounded-none flex flex-col gap-2">
-                            <ArrowDownCircle className="w-5 h-5 text-green-500" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Para Yükle</span>
-                        </Button>
-                        <Button size="lg" className="h-20 bg-zinc-900 border border-white/5 hover:bg-zinc-800 rounded-none flex flex-col gap-2">
-                            <ArrowUpCircle className="w-5 h-5 text-red-500" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Para Çek</span>
-                        </Button>
-                    </div>
-                </div>
-
-                {/* Transaction History */}
-                <div className="md:col-span-8">
-                    <Card className="bg-zinc-900 border-white/5 rounded-none min-h-[500px]">
-                        <CardHeader>
-                            <CardTitle className="text-xs font-bold uppercase tracking-widest text-zinc-500">Tüm Finansal Geçmiş</CardTitle>
-                        </CardHeader>
+                <div className="lg:col-span-3">
+                    <Card className="bg-zinc-900/50 border border-white/10 rounded-[40px] h-full">
+                        <CardHeader><CardTitle className="text-xs font-black uppercase tracking-widest">Son İşlemler</CardTitle></CardHeader>
                         <CardContent>
                             <div className="flex flex-col gap-2">
-                                {user.transactions.length === 0 ? (
-                                    <div className="h-64 flex items-center justify-center text-zinc-600 font-bold uppercase tracking-widest text-xs">Henüz işlem bulunmuyor</div>
-                                ) : (
-                                    user.transactions.map((tx) => (
-                                        <div key={tx.id} className="flex items-center justify-between p-6 bg-white/[0.01] border border-white/5 hover:bg-white/[0.03] transition-colors">
-                                            <div className="flex gap-6 items-center">
-                                                <div className={`p-3 rounded-none ${tx.amount > 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                                                    {tx.amount > 0 ? <ArrowDownCircle className="w-5 h-5" /> : <ArrowUpCircle className="w-5 h-5" />}
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold uppercase tracking-widest">{tx.type}</span>
-                                                    <span className="text-[10px] text-zinc-500 uppercase">{tx.createdAt.toLocaleDateString()} • {tx.status}</span>
-                                                </div>
-                                            </div>
-                                            <span className={`text-xl font-black italic ${tx.amount > 0 ? 'text-white' : 'text-zinc-400'}`}>
-                                                {tx.amount > 0 ? '+' : ''}{tx.amount} ₺
-                                            </span>
+                                {user.transactions.map((tx) => (
+                                    <div key={tx.id} className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center justify-between hover:bg-white/[0.04] transition-all">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">{tx.type}</span>
+                                            <span className="text-xs font-bold text-zinc-500 uppercase">{tx.createdAt.toLocaleDateString()} • {tx.status}</span>
                                         </div>
-                                    ))
-                                )}
+                                        <span className={`text-xl font-black italic tracking-tighter ${tx.amount > 0 ? 'text-white' : 'text-zinc-400'}`}>
+                                            {tx.amount > 0 ? '+' : ''}{tx.amount} ₺
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
                         </CardContent>
                     </Card>
                 </div>
             </div>
+
+            <WithdrawalForm balance={user.walletBalance} />
         </div>
     );
 }
