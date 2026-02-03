@@ -15,16 +15,18 @@ export const authOptions: NextAuthOptions = {
     },
     providers: [
         GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID || "placeholder",
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "placeholder",
+            clientId: process.env.GOOGLE_CLIENT_ID || "PLACEHOLDER",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "PLACEHOLDER",
         }),
         {
             id: "steam",
             name: "Steam",
             type: "oauth",
             authorization: "https://steamcommunity.com/openid/login",
-            // Note: Steam uses OpenID 2.0, which often requires a specific library like next-auth-steam
-            // For now, this is a UI-ready placeholder that integrates into the login buttons.
+            token: "https://steamcommunity.com/openid/login",
+            userinfo: "https://steamcommunity.com/openid/login",
+            // Note: Steam OpenID integration typically uses specific libraries like next-auth-steam
+            // This is a UI-ready structure for the CTO rebuild.
         },
         CredentialsProvider({
             name: "credentials",
@@ -41,23 +43,32 @@ export const authOptions: NextAuthOptions = {
 
                 if (!user || !user.password) return null;
 
-                const isPasswordCorrect = await bcrypt.compare(
+                const isPasswordValid = await bcrypt.compare(
                     credentials.password,
                     user.password
                 );
 
-                if (!isPasswordCorrect) return null;
+                if (!isPasswordValid) return null;
 
-                return user;
+                return {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                    walletBalance: user.walletBalance,
+                };
             },
         }),
     ],
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             if (user) {
                 token.id = user.id;
                 token.role = (user as any).role;
                 token.walletBalance = (user as any).walletBalance;
+            }
+            if (trigger === "update" && session) {
+                token.walletBalance = session.walletBalance;
             }
             return token;
         },

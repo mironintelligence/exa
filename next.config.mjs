@@ -1,28 +1,26 @@
-/** @type {import('next').NextConfig} */
 import createNextIntlPlugin from 'next-intl/plugin';
 
-const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+const withNextIntl = createNextIntlPlugin();
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
     typescript: {
-        ignoreBuildErrors: true
+        ignoreBuildErrors: true,
     },
     eslint: {
-        ignoreDuringBuilds: true
+        ignoreDuringBuilds: true,
     },
     images: {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: '**'
+                hostname: 'lh3.googleusercontent.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'avatars.githubusercontent.com',
             }
-        ],
-        unoptimized: true
-    },
-    experimental: {
-        serverActions: {
-            allowedOrigins: ['*']
-        }
+        ]
     }
 };
 

@@ -1,24 +1,13 @@
 {
     "Index": {
-        "title": "ExA Platform",
-        "hero": {
-            "title": "Play & Earn: The Ultimate Esports Platform",
-            "description": "Join professional tournaments, showcase your skills, and earn real rewards.",
-            "cta": "Get Started"
-        }
+        "title": "ExA ARENA",
+        "description": "Professional Esports & Wagering Platform"
     },
-    "Auth": {
-        "login": "Login",
-        "register": "Register",
-        "google": "Continue with Google",
-        "email": "Email",
-        "password": "Password"
-    },
-    "Navigation": {
+    "Navbar": {
+        "home": "Home",
         "tournaments": "Tournaments",
         "shop": "Shop",
-        "wallet": "Wallet",
-        "profile": "Profile",
-        "admin": "Admin"
+        "leaderboard": "Leaderboard",
+        "quests": "Quests"
     }
 }

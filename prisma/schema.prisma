@@ -15,14 +15,15 @@ enum Role {
 enum TournamentStatus {
   OPEN
   LIVE
-  ENDED
+  FINISHED
 }
 
 enum TransactionType {
   DEPOSIT
   WITHDRAW
   ENTRY_FEE
-  PRIZE
+  REWARD
+  TRANSFER
   PURCHASE
   SUBSCRIPTION
 }
@@ -38,46 +39,90 @@ enum QuestType {
   WEEKLY
 }
 
+enum SubscriptionTier {
+  NONE
+  WEEKLY
+  MONTHLY
+  THREE_MONTH
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model User {
-  id               String            @id @default(cuid())
-  name             String?
-  email            String?           @unique
-  password         String?
-  image            String?
-  walletBalance    Float             @default(0)
-  rank             String            @default("Unranked")
-  level            Int               @default(1)
-  xp               Int               @default(0)
-  role             Role              @default(USER)
-  teamId           String?
-  team             Team?             @relation(fields: [teamId], references: [id])
-  subscriptions    UserSubscription[]
-  transactions     Transaction[]
-  messages         ChatMessage[]
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id                String            @id @default(cuid())
+  name              String?
+  email             String?           @unique
+  emailVerified     DateTime?
+  password          String?
+  image             String?
+  role              Role              @default(USER)
+  walletBalance     Float             @default(0)
+  xp                Int               @default(0)
+  level             Int               @default(1)
+  rankId            String?           @default("Unranked")
+  subscriptionTier  SubscriptionTier  @default(NONE)
+  
+  accounts          Account[]
+  sessions          Session[]
+  
+  teamId            String?
+  team              Team?             @relation(fields: [teamId], references: [id])
+  
+  userSubscriptions UserSubscription[]
+  transactions      Transaction[]
+  gameAccounts      GameAccount[]
+  chatMessages      ChatMessage[]
+  
+  userQuests        UserQuest[]
+  
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 }
 
 model Team {
-  id         String   @id @default(cuid())
-  name       String   @unique
-  logo       String?
-  captainId  String
-  members    User[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String   @unique
+  logo        String?
+  captainId   String
+  members     User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Game {
-  id                     String       @id @default(cuid())
-  name                   String       @unique
-  slug                   String       @unique
-  api_key_placeholder    String?
-  image                  String
-  tournaments            Tournament[]
-  quests                 Quest[]
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @updatedAt
+  id          String       @id @default(cuid())
+  name        String       @unique
+  slug        String       @unique
+  image       String
+  tournaments Tournament[]
+  quests      Quest[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Tournament {
@@ -89,32 +134,32 @@ model Tournament {
   prizePool       Float
   startDate       DateTime
   status          TournamentStatus @default(OPEN)
-  maxParticipants Int
-  isOfficial      Boolean          @default(false)
+  winnerId        String?
+  maxParticipants Int              @default(32)
+  isOfficial      Boolean          @default(true)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
 
 model Subscription {
   id              String             @id @default(cuid())
-  name            String             @unique
+  name            SubscriptionTier   @unique
   price           Float
   features        Json
   durationDays    Int
   userAssignments UserSubscription[]
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
 }
 
 model UserSubscription {
-  id                    String       @id @default(cuid())
-  userId                String
-  user                  User         @relation(fields: [userId], references: [id])
-  subscriptionId        String
-  subscription          Subscription @relation(fields: [subscriptionId], references: [id])
-  startDate             DateTime     @default(now())
-  endDate               DateTime
-  tournamentsJoinedCount Int          @default(0)
+  id              String       @id @default(cuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  subscriptionId  String
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id])
+  startDate       DateTime     @default(now())
+  endDate         DateTime
+  freeEntriesLeft Int          @default(0)
+  createdAt       DateTime     @default(now())
 }
 
 model Transaction {
@@ -124,9 +169,21 @@ model Transaction {
   amount      Float
   type        TransactionType
   status      TransactionStatus @default(PENDING)
-  iban        String?           // For withdrawals
-  fullName    String?           // For withdrawals
+  iban        String?
+  fullName    String?
+  targetEmail String?           // For user-to-user transfer
   createdAt   DateTime          @default(now())
+}
+
+model GameAccount {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  gameId      String
+  accountName String
+  rank        String?
+  stats       Json?
+  createdAt   DateTime @default(now())
 }
 
 model Product {
@@ -136,27 +193,42 @@ model Product {
   price       Float
   image       String
   category    String
+  stock       Int      @default(0)
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model ChatMessage {
   id        String   @id @default(cuid())
-  roomId    String
+  roomId    String   @default("global")
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   content   String
-  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Quest {
-  id           String    @id @default(cuid())
-  title        String
-  description  String
-  type         QuestType @default(DAILY)
-  rewardAmount Float
-  gameId       String
-  game         Game      @relation(fields: [gameId], references: [id])
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id            String      @id @default(cuid())
+  title         String
+  description   String
+  type          QuestType   @default(DAILY)
+  rewardAmount  Float
+  rewardXp      Int         @default(100)
+  gameId        String
+  game          Game        @relation(fields: [gameId], references: [id])
+  isActive      Boolean     @default(true)
+  userQuests    UserQuest[]
+  createdAt     DateTime    @default(now())
+}
+
+model UserQuest {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  questId     String
+  quest       Quest    @relation(fields: [questId], references: [id])
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
 }

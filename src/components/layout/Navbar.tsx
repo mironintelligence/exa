@@ -8,21 +8,37 @@ export async function Navbar() {
     const session = await getServerSession(authOptions);
 
     return (
-        <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-            <nav className="pointer-events-auto h-16 w-full max-w-7xl rounded-full border border-white/10 bg-zinc-950/60 backdrop-blur-xl px-10 flex items-center justify-between shadow-2xl">
-                <div className="flex flex-col gap-0 leading-none">
-                    <Link href="/" className="text-2xl font-black italic tracking-tighter text-blue-500">
+        <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+            <nav className="pointer-events-auto h-20 w-full max-w-7xl rounded-full border border-white/10 bg-zinc-950/40 backdrop-blur-2xl px-12 flex items-center justify-between shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)]">
+                {/* Logo Section */}
+                <div className="flex flex-col gap-0 leading-none group cursor-pointer">
+                    <Link href="/" className="text-3xl font-black italic tracking-tighter text-blue-600 transition-all group-hover:text-blue-400 group-hover:scale-105">
                         ExA
                     </Link>
-                    <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-500 -mt-1 ml-0.5 whitespace-nowrap">By Miron Intelligence</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 -mt-1 ml-1 scale-90 origin-left">By Miron</span>
                 </div>
 
-                <div className="hidden md:flex items-center gap-10">
-                    {['home', 'tournaments', 'shop', 'subscriptions'].map((item) => (
-                        <Link key={item} href={`/${item === 'home' ? '' : item}`} className="text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-white transition-colors uppercase">{item}</Link>
+                {/* Desktop Navigation */}
+                <div className="hidden lg:flex items-center gap-12">
+                    {[
+                        { name: 'Ana Sayfa', path: '/' },
+                        { name: 'Turnuvalar', path: '/tournaments' },
+                        { name: 'Mağaza', path: '/shop' },
+                        { name: 'Liderler', path: '/leaderboard' },
+                        { name: 'Görevler', path: '/quests' }
+                    ].map((item) => (
+                        <Link
+                            key={item.path}
+                            href={item.path}
+                            className="relative text-xs font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-all group py-2"
+                        >
+                            {item.name}
+                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left shadow-[0_0_12px_rgba(37,99,235,1)]" />
+                        </Link>
                     ))}
                 </div>
 
+                {/* Actions Section */}
                 <div className="flex items-center gap-6">
                     <ThemeToggle />
                     <UserNav session={session} />

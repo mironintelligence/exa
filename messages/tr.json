@@ -1,24 +1,13 @@
 {
     "Index": {
-        "title": "ExA Platform",
-        "hero": {
-            "title": "Oyna ve Kazan: En İyi Espor Platformu",
-            "description": "Profesyonel turnuvalara katılın, yeteneklerinizi sergileyin ve gerçek ödüller kazanın.",
-            "cta": "Hemen Başla"
-        }
+        "title": "ExA ARENA",
+        "description": "Profesyonel Espor ve Bahis Platformu"
     },
-    "Auth": {
-        "login": "Giriş Yap",
-        "register": "Kayıt Ol",
-        "google": "Google ile Devam Et",
-        "email": "E-posta",
-        "password": "Şifre"
-    },
-    "Navigation": {
+    "Navbar": {
+        "home": "Ana Sayfa",
         "tournaments": "Turnuvalar",
         "shop": "Mağaza",
-        "wallet": "Cüzdan",
-        "profile": "Profil",
-        "admin": "Yönetim"
+        "leaderboard": "Liderler",
+        "quests": "Görevler"
     }
 }

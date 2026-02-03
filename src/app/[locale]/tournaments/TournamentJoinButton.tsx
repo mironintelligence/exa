@@ -1,27 +1,28 @@
 "use client";
 
-import { buySubscription } from "@/actions/economy";
+import { joinTournament } from "@/actions/economy";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-export default function SubscriptionButton({ tier, session }: { tier: any, session: any }) {
+export default function TournamentJoinButton({ tournamentId, session }: { tournamentId: string, session: any }) {
     const router = useRouter();
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
-    const handleBuy = async () => {
+    const handleJoin = async () => {
         if (!session) return router.push('/auth/login');
 
         setLoading(true);
         try {
-            await buySubscription(tier);
-            toast({ title: "TEBRİKLER!", description: "Üyeliğin başarıyla aktif edildi. Keyfini çıkar!" });
+            await joinTournament(tournamentId);
+            toast({ title: "BAŞARILI!", description: "Turnuvaya katıldın. Takım detayları mail adresine gönderilecek." });
             router.refresh();
         } catch (e: any) {
             toast({ variant: "destructive", title: "HATA", description: e.message });
             if (e.message.includes("bakiye")) {
+                // Proactive UX: redirect to wallet or subscription
                 setTimeout(() => router.push('/wallet'), 2000);
             }
         } finally {
@@ -31,12 +32,11 @@ export default function SubscriptionButton({ tier, session }: { tier: any, sessi
 
     return (
         <Button
-            onClick={handleBuy}
+            onClick={handleJoin}
             disabled={loading}
-            className={`h-20 w-full rounded-[28px] font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 shadow-2xl ${tier === 'THREE_MONTH' ? 'bg-white text-black hover:bg-zinc-200' : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
+            className="h-14 flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-xl transition-all active:scale-95 disabled:opacity-50"
         >
-            {loading ? 'SİSTEM AKTİVE EDİLİYOR...' : 'ŞİMDİ ABONE OL'}
+            {loading ? 'SİSTEME GİRİLİYOR...' : 'KATILIM İSTEĞİ GÖNDER'}
         </Button>
     );
 }

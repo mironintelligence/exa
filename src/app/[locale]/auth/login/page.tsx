@@ -1,9 +1,13 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import { Link } from "@/navigation";
 import { useState } from "react";
+import { Link } from "@/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Github, Globe, Steam, ArrowRight, ShieldCheck, Mail, Lock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -13,74 +17,107 @@ export default function LoginPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        await signIn("credentials", { email, password, callbackUrl: "/" });
+        await signIn("credentials", {
+            email,
+            password,
+            callbackUrl: "/",
+        });
         setLoading(false);
     };
 
     return (
-        <div className="min-h-screen pt-40 pb-20 flex items-center justify-center px-4">
-            <div className="w-full max-w-md bg-zinc-950/80 backdrop-blur-2xl border border-white/10 rounded-[40px] p-12 shadow-2xl overflow-hidden relative">
-                <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-blue-600 to-cyan-400" />
+        <div className="min-h-[90vh] flex items-center justify-center container px-8 relative overflow-hidden">
+            {/* Decorative Grid */}
+            <div className="absolute inset-x-0 top-0 h-[500px] bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.15),transparent_70%)] pointer-events-none" />
 
-                <div className="text-center mb-12">
-                    <h1 className="text-5xl font-black italic tracking-tighter uppercase text-white">Giriş Yap</h1>
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mt-4">ExA Gaming Arena Girişi</p>
-                </div>
+            <div className="w-full max-w-xl relative group">
+                {/* Background Glow */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-[48px] blur-2xl opacity-20 group-hover:opacity-30 transition duration-1000" />
 
-                <div className="flex flex-col gap-8">
-                    <div className="grid grid-cols-2 gap-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => signIn('google')}
-                            className="h-14 rounded-2xl border-white/5 bg-white/[0.02] hover:bg-white/[0.05] group"
-                        >
-                            <svg className="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" /><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" /></svg>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => signIn('steam')}
-                            className="h-14 rounded-2xl border-white/5 bg-white/[0.02] hover:bg-white/[0.05] group"
-                        >
-                            <svg className="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="currentColor"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.671c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.009l2.83-4.145V8.91c0-2.028 1.644-3.673 3.673-3.673 2.028 0 3.673 1.645 3.673 3.673s-1.645 3.673-3.673 3.673c-.056 0-.112-.003-.168-.007l-4.145 2.83h-.073c-2.028 0-3.673-1.645-3.673-3.673 0-.056.002-.112.006-.168L3.25 12.3c.003.044.005.088.005.132 0 2.21-1.792 4.002-4.002 4.002-2.21 0-4.002-1.792-4.002-4.002 0-2.124 1.655-3.861 3.738-3.99l2.825-11.666c.071-.295.32-.511.62-.511.3 0 .549.216.62.511l.732 3.024A12.04 12.04 0 0 1 11.979 0z" /></svg>
-                        </Button>
-                    </div>
-
-                    <div className="relative h-4 flex items-center justify-center">
-                        <div className="w-full h-[1px] bg-white/5" />
-                        <span className="absolute bg-zinc-950 px-4 text-[8px] font-black text-zinc-600 tracking-[0.5em] uppercase italic">BİLGİLERLE GİRİŞ</span>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                        <div className="flex flex-col gap-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-2">E-POSTA</label>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="h-16 bg-white/[0.02] border border-white/10 rounded-3xl px-6 text-sm text-white focus:outline-none focus:border-blue-600 transition-all font-medium"
-                                placeholder="E-POSTA"
-                                required
-                            />
+                <div className="relative bg-zinc-950/80 backdrop-blur-3xl border border-white/10 rounded-[48px] p-12 lg:p-16 shadow-3xl">
+                    <div className="flex flex-col items-center text-center gap-6 mb-12">
+                        <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-2xl animate-float">
+                            <ShieldCheck className="w-10 h-10" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-2">PAROLA</label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="h-16 bg-white/[0.02] border border-white/10 rounded-3xl px-6 text-sm text-white focus:outline-none focus:border-blue-600 transition-all font-medium"
-                                placeholder="••••••••"
-                                required
-                            />
+                            <Badge className="bg-blue-600/10 text-blue-500 font-black text-[8px] tracking-[0.4em] uppercase py-1 px-4 rounded-full w-fit mx-auto">GÜVENLİ GİRİŞ</Badge>
+                            <h1 className="text-4xl font-black italic tracking-tighter uppercase text-white">ARENAYA DÖN</h1>
                         </div>
-                        <Button disabled={loading} className="h-16 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-[0.2em] rounded-3xl mt-4 shadow-xl">
-                            {loading ? "GİRİŞ YAPILIYOR..." : "ARENAYA GİRİŞ"}
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        <div className="space-y-6">
+                            <div className="space-y-2 group">
+                                <Label className="text-[10px] font-black uppercase text-zinc-500 ml-6 tracking-widest">E-posta Adresi</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 group-focus-within:text-blue-500 transition-colors" />
+                                    <Input
+                                        type="email"
+                                        placeholder="pro@exa.com"
+                                        className="h-16 pl-14 pr-8 bg-zinc-950 border-white/5 rounded-3xl font-bold focus:border-blue-600 transition-all outline-none"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2 group">
+                                <div className="flex items-center justify-between px-6">
+                                    <Label className="text-[10px] font-black uppercase text-zinc-500 tracking-widest">Şifre</Label>
+                                    <span className="text-[10px] font-black text-blue-500 cursor-pointer uppercase hover:text-cyan-400">ŞİFREMİ UNUTTUM</span>
+                                </div>
+                                <div className="relative">
+                                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 group-focus-within:text-blue-500 transition-colors" />
+                                    <Input
+                                        type="password"
+                                        placeholder="••••••••"
+                                        className="h-16 pl-14 pr-8 bg-zinc-950 border-white/5 rounded-3xl font-bold focus:border-blue-600 transition-all outline-none"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <Button
+                            disabled={loading}
+                            className="w-full h-18 rounded-3xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95 text-xs group"
+                        >
+                            {loading ? 'SİSTEME GİRİLİYOR...' : 'OTURUMU AÇ'}
+                            <ArrowRight className="ml-3 w-4 h-4 group-hover:translate-x-2 transition-transform" />
                         </Button>
                     </form>
 
-                    <p className="text-center text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                        Hesabın yok mu? <Link href="/auth/register" className="text-blue-400">YENİ BİR TANE AÇ &rarr;</Link>
-                    </p>
+                    <div className="relative my-12">
+                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5" /></div>
+                        <div className="relative flex justify-center text-[10px] uppercase font-black text-zinc-700 tracking-[0.3em]"><span className="bg-zinc-950 px-6">VEYA</span></div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <Button
+                            onClick={() => signIn("google", { callbackUrl: "/" })}
+                            variant="outline"
+                            className="h-16 rounded-3xl border-white/5 bg-white/[0.02] hover:bg-white/[0.05] text-[10px] font-black uppercase tracking-widest gap-3"
+                        >
+                            <Globe className="w-4 h-4 text-zinc-400" /> Google
+                        </Button>
+                        <Button
+                            onClick={() => signIn("steam", { callbackUrl: "/" })}
+                            variant="outline"
+                            className="h-16 rounded-3xl border-white/5 bg-white/[0.02] hover:bg-white/[0.05] text-[10px] font-black uppercase tracking-widest gap-3"
+                        >
+                            <div className="w-4 h-4 flex items-center justify-center bg-zinc-400 rounded-full text-zinc-900 invert">
+                                <span className="font-bold text-[8px]">S</span>
+                            </div> Steam
+                        </Button>
+                    </div>
+
+                    <div className="mt-12 text-center">
+                        <p className="text-[10px] font-bold uppercase text-zinc-600 tracking-widest">
+                            HENÜZ HESABIN YOK MU? <Link href="/auth/register" className="text-blue-500 font-black hover:text-cyan-400 ml-2">KAYIT OL</Link>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
