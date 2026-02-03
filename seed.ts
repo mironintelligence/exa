@@ -1,41 +1,83 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🌱 Seeding database...');
+    console.log('🌱 Professional Seeding started...');
 
-    // Clear existing data
-    await prisma.game.deleteMany();
-
-    // Create games
+    // Create Games
     const games = [
+        {
+            name: 'Valorant',
+            slug: 'valorant',
+            image: '/images/games/valorant-hero.jpg',
+        },
         {
             name: 'Counter-Strike 2',
             slug: 'cs2',
-            image: '/images/cs2.jpg',
-            status: 'ACTIVE' as const,
+            image: '/images/games/cs2-hero.jpg',
         },
         {
             name: 'PUBG Mobile',
             slug: 'pubg-mobile',
-            image: '/images/pubg.jpg',
-            status: 'ACTIVE' as const,
-        },
-        {
-            name: 'Valorant',
-            slug: 'valorant',
-            image: '/images/valorant.jpg',
-            status: 'COMING_SOON' as const,
+            image: '/images/games/pubg-hero.jpg',
         },
     ];
 
     for (const game of games) {
-        await prisma.game.create({
-            data: game,
+        await prisma.game.upsert({
+            where: { name: game.name },
+            update: {},
+            create: game,
         });
-        console.log(`✅ Created game: ${game.name}`);
     }
+
+    // Create Subscriptions
+    const subscriptions = [
+        {
+            name: 'Haftalık',
+            price: 399.99,
+            durationDays: 7,
+            features: ['2 Ücretsiz Turnuva Katılımı'],
+        },
+        {
+            name: 'Aylık',
+            price: 1199.99,
+            durationDays: 30,
+            features: ['10 Ücretsiz Turnuva Katılımı', 'Günlük/Haftalık Görev Erişimi'],
+        },
+        {
+            name: '3 Aylık',
+            price: 2499.00,
+            durationDays: 90,
+            features: ['15 Ücretsiz Turnuva Katılımı', 'Quests', 'Tüm Turnuvalarda %10 İndirim'],
+        },
+    ];
+
+    for (const sub of subscriptions) {
+        await prisma.subscription.upsert({
+            where: { name: sub.name },
+            update: {},
+            create: sub,
+        });
+    }
+
+    // Create Admin User
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await prisma.user.upsert({
+        where: { email: 'admin@exa.com' },
+        update: {},
+        create: {
+            email: 'admin@exa.com',
+            name: 'Administrator',
+            password: hashedPassword,
+            role: 'ADMIN',
+            walletBalance: 1000000,
+            rank: 'Radiant',
+            level: 99,
+        },
+    });
 
     console.log('✨ Seeding completed!');
 }

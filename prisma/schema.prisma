@@ -7,19 +7,153 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum GameStatus {
-  ACTIVE
-  COMING_SOON
-  MAINTENANCE
-  DISABLED
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TournamentStatus {
+  OPEN
+  LIVE
+  ENDED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+  ENTRY_FEE
+  PRIZE
+  PURCHASE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  REJECTED
+}
+
+enum QuestType {
+  DAILY
+  WEEKLY
+}
+
+model User {
+  id               String            @id @default(cuid())
+  name             String?
+  email            String?           @unique
+  password         String?
+  image            String?
+  walletBalance    Float             @default(0)
+  rank             String            @default("Unranked")
+  level            Int               @default(1)
+  xp               Int               @default(0)
+  role             Role              @default(USER)
+  teamId           String?
+  team             Team?             @relation(fields: [teamId], references: [id])
+  subscriptions    UserSubscription[]
+  transactions     Transaction[]
+  messages         ChatMessage[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model Team {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  logo       String?
+  captainId  String
+  members    User[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Game {
-  id        String     @id @default(cuid())
-  name      String     @unique
-  slug      String     @unique
-  image     String
-  status    GameStatus @default(COMING_SOON)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id                     String       @id @default(cuid())
+  name                   String       @unique
+  slug                   String       @unique
+  api_key_placeholder    String?
+  image                  String
+  tournaments            Tournament[]
+  quests                 Quest[]
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+}
+
+model Tournament {
+  id              String           @id @default(cuid())
+  title           String
+  gameId          String
+  game            Game             @relation(fields: [gameId], references: [id])
+  entryFee        Float
+  prizePool       Float
+  startDate       DateTime
+  status          TournamentStatus @default(OPEN)
+  maxParticipants Int
+  isOfficial      Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  name            String             @unique
+  price           Float
+  features        Json
+  durationDays    Int
+  userAssignments UserSubscription[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model UserSubscription {
+  id                    String       @id @default(cuid())
+  userId                String
+  user                  User         @relation(fields: [userId], references: [id])
+  subscriptionId        String
+  subscription          Subscription @relation(fields: [subscriptionId], references: [id])
+  startDate             DateTime     @default(now())
+  endDate               DateTime
+  tournamentsJoinedCount Int          @default(0)
+}
+
+model Transaction {
+  id        String            @id @default(cuid())
+  userId    String
+  user      User              @relation(fields: [userId], references: [id])
+  amount    Float
+  type      TransactionType
+  status    TransactionStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  image       String
+  category    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  roomId    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  timestamp DateTime @default(now())
+}
+
+model Quest {
+  id           String    @id @default(cuid())
+  title        String
+  description  String
+  type         QuestType @default(DAILY)
+  rewardAmount Float
+  gameId       String
+  game         Game      @relation(fields: [gameId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

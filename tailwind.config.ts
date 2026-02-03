@@ -6,6 +6,13 @@ const config: Config = {
         "./src/**/*.{ts,tsx}",
     ],
     theme: {
+        container: {
+            center: true,
+            padding: "2rem",
+            screens: {
+                "2xl": "1400px",
+            },
+        },
         extend: {
             colors: {
                 border: "hsl(var(--border))",
@@ -14,32 +21,32 @@ const config: Config = {
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
                 primary: {
-                    DEFAULT: "hsl(var(--primary))",
-                    foreground: "hsl(var(--primary-foreground))",
+                    DEFAULT: "hsl(221, 83%, 53%)", // Electric Blue
+                    foreground: "hsl(210, 40%, 98%)",
                 },
                 secondary: {
-                    DEFAULT: "hsl(var(--secondary))",
-                    foreground: "hsl(var(--secondary-foreground))",
+                    DEFAULT: "hsl(240, 3.7%, 15.9%)",
+                    foreground: "hsl(0, 0%, 98%)",
                 },
                 destructive: {
-                    DEFAULT: "hsl(var(--destructive))",
-                    foreground: "hsl(var(--destructive-foreground))",
+                    DEFAULT: "hsl(0, 84.2%, 60.2%)",
+                    foreground: "hsl(0, 0%, 98%)",
                 },
                 muted: {
-                    DEFAULT: "hsl(var(--muted))",
-                    foreground: "hsl(var(--muted-foreground))",
+                    DEFAULT: "hsl(240, 3.7%, 15.9%)",
+                    foreground: "hsl(240, 5%, 64.9%)",
                 },
                 accent: {
-                    DEFAULT: "hsl(var(--accent))",
-                    foreground: "hsl(var(--accent-foreground))",
+                    DEFAULT: "hsl(240, 3.7%, 15.9%)",
+                    foreground: "hsl(0, 0%, 98%)",
                 },
                 popover: {
-                    DEFAULT: "hsl(var(--popover))",
-                    foreground: "hsl(var(--popover-foreground))",
+                    DEFAULT: "hsl(240, 10%, 3.9%)",
+                    foreground: "hsl(0, 0%, 98%)",
                 },
                 card: {
-                    DEFAULT: "hsl(var(--card))",
-                    foreground: "hsl(var(--card-foreground))",
+                    DEFAULT: "hsl(240, 10%, 3.9%)",
+                    foreground: "hsl(0, 0%, 98%)",
                 },
             },
             borderRadius: {
@@ -47,9 +54,23 @@ const config: Config = {
                 md: "calc(var(--radius) - 2px)",
                 sm: "calc(var(--radius) - 4px)",
             },
+            keyframes: {
+                "accordion-down": {
+                    from: { height: "0" },
+                    to: { height: "var(--radix-accordion-content-height)" },
+                },
+                "accordion-up": {
+                    from: { height: "var(--radix-accordion-content-height)" },
+                    to: { height: "0" },
+                },
+            },
+            animation: {
+                "accordion-down": "accordion-down 0.2s ease-out",
+                "accordion-up": "accordion-up 0.2s ease-out",
+            },
         },
     },
-    plugins: [],
+    plugins: [require("tailwindcss-animate")],
 };
 
 export default config;
