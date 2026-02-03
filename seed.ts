@@ -11,6 +11,12 @@ async function main() {
     // Create games
     const games = [
         {
+            name: 'Counter-Strike 2',
+            slug: 'cs2',
+            image: '/images/cs2.jpg',
+            status: 'ACTIVE' as const,
+        },
+        {
             name: 'PUBG Mobile',
             slug: 'pubg-mobile',
             image: '/images/pubg.jpg',

@@ -4,23 +4,33 @@ import { getGames } from '@/actions/games';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-export default async function HomePage() {
+export default async function HomePage({
+    searchParams,
+}: {
+    searchParams: { admin?: string };
+}) {
     const games = await getGames();
+    const isAdmin = searchParams?.admin === 'true';
+
+    // For non-admins, only show ACTIVE games
+    const visibleGames = isAdmin
+        ? games
+        : games.filter((game) => game.status === 'ACTIVE');
 
     return (
         <div className="min-h-screen bg-zinc-950 text-white">
             <div className="container mx-auto px-4 py-12">
                 <header className="mb-12 text-center">
-                    <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-orange-500 to-blue-500 bg-clip-text text-transparent">
                         ExA Gaming Platform
                     </h1>
                     <p className="text-zinc-400 text-lg">
-                        Choose your game and compete in tournaments
+                        Savaş başlasın! Favori oyununu seç ve turnuvalara katıl.
                     </p>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                    {games.map((game) => {
+                    {visibleGames.map((game) => {
                         const isActive = game.status === 'ACTIVE';
                         const isComingSoon = game.status === 'COMING_SOON';
 
