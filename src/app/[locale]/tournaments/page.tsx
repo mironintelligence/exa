@@ -70,7 +70,7 @@ export default async function TournamentsPage() {
             {/* Grid of Tournaments */}
             <div className="grid lg:grid-cols-2 gap-10">
                 {tournaments.map((tourney) => (
-                    <Card key={tourney.id} tournament={tourney} session={session} />
+                    <TournamentCard key={tourney.id} tournament={tourney} session={session} />
                 ))}
             </div>
 
@@ -89,7 +89,7 @@ export default async function TournamentsPage() {
     );
 }
 
-function Card({ tournament, session }: any) {
+function TournamentCard({ tournament, session }: any) {
     return (
         <div className="group relative bg-zinc-950 border border-white/5 rounded-[56px] p-10 flex flex-col sm:flex-row gap-10 hover:border-blue-500/30 transition-all hover:-translate-y-2 shadow-2xl">
             <div className="relative w-full sm:w-48 h-48 rounded-[40px] overflow-hidden">

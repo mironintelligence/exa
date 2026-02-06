@@ -1,9 +1,12 @@
 import { db } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { Zap, Clock, Shield, Target, Trophy, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import QuestFollowButton from "./QuestFollowButton";
 
 export default async function QuestsPage() {
+    const session = await getServerSession(authOptions);
     const quests = await db.quest.findMany({ where: { isActive: true }, include: { game: true } });
 
     return (
@@ -58,9 +61,7 @@ export default async function QuestsPage() {
                                         <span className="text-xl font-black italic text-blue-500">+{quest.rewardXp} XP</span>
                                     </div>
                                 </div>
-                                <Button className="h-14 px-10 rounded-2xl bg-white text-black hover:bg-zinc-200 font-black uppercase text-[10px] tracking-widest shadow-xl italic">
-                                    TAKİP ET
-                                </Button>
+                                <QuestFollowButton questId={quest.id} session={session} />
                             </div>
                         </div>
                     </div>

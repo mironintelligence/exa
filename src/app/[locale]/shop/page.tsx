@@ -2,8 +2,8 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { ShoppingBag, Star, Zap, CreditCard, ChevronRight, Search, Gift } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import ShopBuyButton from "./ShopBuyButton";
 
 export default async function ShopPage() {
     const products = await db.product.findMany({ where: { isActive: true } });
@@ -28,7 +28,6 @@ export default async function ShopPage() {
                 </div>
             </div>
 
-            {/* Categories */}
             <div className="flex flex-wrap gap-4">
                 {['HEPSİ', 'VALORANT VP', 'UC', 'STEAM', 'HEDİYE KARTLARI'].map((cat, i) => (
                     <button key={i} className={`px-8 py-4 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest ${i === 0 ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-white/5 border-white/5 text-zinc-500 hover:text-white hover:border-blue-500/20'}`}>
@@ -37,7 +36,6 @@ export default async function ShopPage() {
                 ))}
             </div>
 
-            {/* Product Grid */}
             <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-8">
                 {products.map((item) => (
                     <div key={item.id} className="group flex flex-col bg-zinc-900 border border-white/5 rounded-[48px] overflow-hidden hover:border-blue-500/30 transition-all hover:-translate-y-2 shadow-2xl">
@@ -65,9 +63,7 @@ export default async function ShopPage() {
                                 </div>
                             </div>
 
-                            <Button className="w-full h-16 rounded-[24px] bg-white text-black hover:bg-zinc-200 font-black uppercase text-xs tracking-[0.2em] shadow-xl group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                SATIN AL
-                            </Button>
+                            <ShopBuyButton productId={item.id} session={session} price={item.price} />
                         </div>
                     </div>
                 ))}

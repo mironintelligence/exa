@@ -152,3 +152,82 @@ export async function buySubscription(tier: 'WEEKLY' | 'MONTHLY' | 'THREE_MONTH'
 
     revalidatePath('/profile');
 }
+
+// SHOP ACTIONS
+export async function buyProduct(productId: string) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) throw new Error("Giriş yapmalısınız");
+
+    const product = await db.product.findUnique({ where: { id: productId } });
+    if (!product) throw new Error("Ürün bulunamadı");
+    if (product.stock <= 0) throw new Error("Stokta ürün kalmadı");
+
+    const userId = (session.user as any).id;
+    const user = await db.user.findUnique({ where: { id: userId } });
+
+    if (!user || user.walletBalance < product.price) throw new Error("Yetersiz bakiye");
+
+    await db.$transaction([
+        db.user.update({ where: { id: userId }, data: { walletBalance: { decrement: product.price } } }),
+        db.product.update({ where: { id: productId }, data: { stock: { decrement: 1 } } }),
+        db.transaction.create({
+            data: { userId, amount: -product.price, type: 'PURCHASE', status: 'COMPLETED' }
+        })
+    ]);
+
+    revalidatePath('/shop');
+    revalidatePath('/profile');
+}
+
+// QUEST ACTIONS
+export async function followQuest(questId: string) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) throw new Error("Giriş yapmalısınız");
+
+    const userId = (session.user as any).id;
+    const existing = await db.userQuest.findFirst({
+        where: { userId, questId }
+    });
+
+    if (existing) throw new Error("Bu görevi zaten takip ediyorsunuz");
+
+    await db.userQuest.create({
+        data: { userId, questId }
+    });
+
+    revalidatePath('/quests');
+}
+
+// TEAM ACTIONS
+export async function createTeam(name: string) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) throw new Error("Giriş yapmalısınız");
+
+    const userId = (session.user as any).id;
+
+    await db.team.create({
+        data: {
+            name,
+            ownerId: userId,
+            members: { connect: { id: userId } }
+        }
+    });
+
+    revalidatePath('/profile');
+}
+
+export async function joinTeam(teamId: string) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) throw new Error("Giriş yapmalısınız");
+
+    const userId = (session.user as any).id;
+
+    await db.team.update({
+        where: { id: teamId },
+        data: {
+            members: { connect: { id: userId } }
+        }
+    });
+
+    revalidatePath('/profile');
+}
