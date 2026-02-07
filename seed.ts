@@ -1,12 +1,10 @@
 import { PrismaClient } from '@prisma/client'
 
-// Prisma Client'ı global tanımla veya yeni oluştur
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Veritabanı tohumlanıyor...')
 
-  // 1. OYUNLARI OLUŞTUR (PUBG Mobile & CS:GO)
   // PUBG Mobile
   await prisma.game.upsert({
     where: { slug: 'pubg-mobile' },
@@ -14,57 +12,46 @@ async function main() {
     create: {
       name: 'PUBG Mobile',
       slug: 'pubg-mobile',
-      image: '/images/games/pubg.jpg', // Resim yolunu sonra eklersin
+      image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80',
+      // @ts-ignore
       status: 'ACTIVE'
     }
   })
 
-  // CS:GO (Counter-Strike 2)
+  // CS:GO
   await prisma.game.upsert({
     where: { slug: 'csgo' },
     update: {},
     create: {
       name: 'Counter-Strike 2',
       slug: 'csgo',
-      image: '/images/games/cs2.jpg',
+      image: 'https://images.unsplash.com/photo-1624138784181-dc7f5b750318?auto=format&fit=crop&q=80',
+      // @ts-ignore
       status: 'ACTIVE'
     }
   })
-  
-  // Eski Valorant varsa onu pasife çek veya sil (Opsiyonel)
-  try {
-      await prisma.game.update({
-          where: { slug: 'valorant' },
-          data: { status: 'DISABLED' }
-      })
-  } catch (e) {
-      // Valorant yoksa hata verme devam et
-  }
 
-  // 2. ADMIN HESABI OLUŞTUR
+  // Admin Hesabı
   const adminEmail = "mironintelligence@gmail.com"
-  
   await prisma.user.upsert({
     where: { email: adminEmail },
-    update: { 
-        role: 'ADMIN', 
-        balance: 10000 
-    },
+    // @ts-ignore
+    update: { role: 'ADMIN', balance: 10000 },
     create: {
       email: adminEmail,
       name: "Kerim Baba",
+      // @ts-ignore
       role: 'ADMIN',
+      // @ts-ignore
       balance: 10000
     }
   })
 
-  console.log("✅ Veritabanı başarıyla güncellendi: PUBG Mobile ve CS:GO aktif!")
+  console.log("✅ Veritabanı başarıyla güncellendi!")
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
+  .then(async () => await prisma.$disconnect())
   .catch(async (e) => {
     console.error(e)
     await prisma.$disconnect()
